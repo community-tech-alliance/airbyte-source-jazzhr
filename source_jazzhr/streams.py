@@ -15,15 +15,12 @@ class JazzHRStream(HttpStream, ABC):
     Parent class extended by all stream-specific classes
     """
 
-    url_base = "https://api.resumatorapi.com/v1/"
-
     def __init__(
         self, config, **kwargs
     ):
         super().__init__(**kwargs)
         self.config = config
         self.url_base = "https://api.resumatorapi.com/v1/"
-        self.api_key = config['api_key']
         self.page = 1
 
     def request_headers(
