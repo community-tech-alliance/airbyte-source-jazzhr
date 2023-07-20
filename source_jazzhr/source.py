@@ -20,8 +20,9 @@ from source_jazzhr.streams import (
     Jobs,
     QuestionnaireAnswers,
     Tasks,
-    Users
+    Users,
 )
+
 
 # Source
 class SourceJazzHR(AbstractSource):
@@ -33,12 +34,10 @@ class SourceJazzHR(AbstractSource):
         :param logger:  logger object
         :return Tuple[bool, any]: (True, None) if the input config can be used to connect to the API successfully, (False, error) otherwise.
         """
-        api_key = config['api_key']
+        api_key = config["api_key"]
         connection_url = f"https://api.resumatorapi.com/v1/categories?apikey={api_key}"
         try:
-            response = requests.get(
-                url=connection_url
-            )
+            response = requests.get(url=connection_url)
             response.raise_for_status()
             return True, None
         except Exception as e:

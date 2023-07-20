@@ -9,43 +9,44 @@ import logging
 import requests
 from airbyte_cdk.sources.streams.http import HttpStream
 
+
 # Basic full refresh stream
 class JazzHRStream(HttpStream, ABC):
     """
     Parent class extended by all stream-specific classes
     """
 
-    def __init__(
-        self, config, **kwargs
-    ):
+    def __init__(self, config, **kwargs):
         super().__init__(**kwargs)
         self.config = config
         self.url_base = "https://api.resumatorapi.com/v1/"
         self.page = 1
 
     def request_headers(
-        self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None
+        self,
+        stream_state: Mapping[str, Any],
+        stream_slice: Mapping[str, Any] = None,
+        next_page_token: Mapping[str, Any] = None,
     ) -> Mapping[str, Any]:
+        return {"Authorization": "OAuth " + self.config["api_key"]}
 
-        return {
-            "Authorization": "OAuth " + self.config["api_key"]
-        }
-
-    def next_page_token(self, response: requests.Response) -> Optional[Mapping[str, Any]]:
-        '''
+    def next_page_token(
+        self, response: requests.Response
+    ) -> Optional[Mapping[str, Any]]:
+        """
         Pagination for all endpoints is achieved by incrementing `/page/#` in the request URL
         The response does not indicate how many pages there will be,
         so we just need to keep trying to fetch the next page of results
 
         Each page of results has a max of 100 records,
         so we only increment if the current page returned 100 records
-        '''
-        
+        """
+
         # WHILE TESTING, limit to 5 pages of results
         # (or we're gonna be here forever)
         # if len(response.json())==100 and self.page<5:
-        if len(response.json())==100:
-            self.page+=1
+        if len(response.json()) == 100:
+            self.page += 1
             return True
         else:
             return False
@@ -58,12 +59,11 @@ class JazzHRStream(HttpStream, ABC):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> Iterable[Mapping]:
-
         response_json = response.json()
         yield from response_json
 
-class Activities(JazzHRStream):
 
+class Activities(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -73,13 +73,12 @@ class Activities(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"activities/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
 
-class Applicants(JazzHRStream):
 
+class Applicants(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -89,13 +88,12 @@ class Applicants(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"applicants/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
-class ApplicantsToJobs(JazzHRStream):
 
+
+class ApplicantsToJobs(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -105,13 +103,12 @@ class ApplicantsToJobs(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"applicants2jobs/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
-class CategoriesToApplicants(JazzHRStream):
 
+
+class CategoriesToApplicants(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -121,13 +118,12 @@ class CategoriesToApplicants(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"categories2applicants/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
-class Categories(JazzHRStream):
 
+
+class Categories(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -137,11 +133,11 @@ class Categories(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"categories/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
+
+
 class Contacts(JazzHRStream):
     """
     No records returned with the API key used for development,
@@ -158,13 +154,12 @@ class Contacts(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"contacts/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
-class Hires(JazzHRStream):
 
+
+class Hires(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -174,13 +169,12 @@ class Hires(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"hires/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
-class Jobs(JazzHRStream):
 
+
+class Jobs(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -190,13 +184,12 @@ class Jobs(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"jobs/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
-class QuestionnaireAnswers(JazzHRStream):
 
+
+class QuestionnaireAnswers(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -206,13 +199,12 @@ class QuestionnaireAnswers(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"questionnaire_answers/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
-class Tasks(JazzHRStream):
 
+
+class Tasks(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -222,13 +214,12 @@ class Tasks(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"tasks/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
-    
-class Users(JazzHRStream):
 
+
+class Users(JazzHRStream):
     primary_key = "id"
 
     def path(
@@ -238,7 +229,6 @@ class Users(JazzHRStream):
         next_page_token: Mapping[str, Any] = None,
         **kwargs,
     ) -> str:
-        
         endpoint = f"users/page/{self.page}/?apikey={self.api_key}"
 
         return endpoint
