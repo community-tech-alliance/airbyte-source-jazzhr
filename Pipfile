@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-source-jazzhr = {editable = true, file = "file:///Users/emilycogsdill/Documents/GitHub/airbyte-source-jazzhr"}
 
 [dev-packages]
 
