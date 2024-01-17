@@ -16,10 +16,12 @@ class JazzHRStream(HttpStream, ABC):
     Parent class extended by all stream-specific classes
     """
 
+    url_base = "https://api.resumatorapi.com/v1/"
+
     def __init__(self, config, **kwargs):
         super().__init__(**kwargs)
         self.config = config
-        self.url_base = "https://api.resumatorapi.com/v1/"
+        self.api_key = config["api_key"]
         self.page = 1
 
     def request_headers(
@@ -28,7 +30,7 @@ class JazzHRStream(HttpStream, ABC):
         stream_slice: Mapping[str, Any] = None,
         next_page_token: Mapping[str, Any] = None,
     ) -> Mapping[str, Any]:
-        return {"Authorization": "OAuth " + self.config["api_key"]}
+        return {"Authorization": "OAuth " + self.api_key}
 
     def next_page_token(
         self, response: requests.Response
@@ -42,9 +44,6 @@ class JazzHRStream(HttpStream, ABC):
         so we only increment if the current page returned 100 records
         """
 
-        # WHILE TESTING, limit to 5 pages of results
-        # (or we're gonna be here forever)
-        # if len(response.json())==100 and self.page<5:
         if len(response.json()) == 100:
             self.page += 1
             return True
