@@ -60,7 +60,8 @@ python main.py read --config secrets/config.json --catalog integration_tests/con
 #### Build
 First, make sure you build the latest Docker image:
 ```
-docker build . -t emilycogsdill/source-jazzhr:dev
+docker buildx build \
+--platform=linux/amd64,linux/arm64,linux/arm/v7 . -t communitytechalliance/airbyte-source-jazzhr:dev --push
 ```
 
 You can also build the connector image via Gradle:
@@ -73,10 +74,10 @@ the Dockerfile.
 #### Run
 Then run any of the connector commands as follows:
 ```
-docker run --rm emilycogsdill/source-jazzhr:dev spec
-docker run --rm -v $(pwd)/secrets:/secrets emilycogsdill/source-jazzhr:dev check --config /secrets/config.json
-docker run --rm -v $(pwd)/secrets:/secrets emilycogsdill/source-jazzhr:dev discover --config /secrets/config.json
-docker run --rm -v $(pwd)/secrets:/secrets -v $(pwd)/integration_tests:/integration_tests emilycogsdill/source-jazzhr:dev read --config /secrets/config.json --catalog /integration_tests/configured_catalog.json
+docker run --rm communitytechalliance/airbyte-source-jazzhr:dev spec
+docker run --rm -v $(pwd)/secrets:/secrets communitytechalliance/airbyte-source-jazzhr:dev check --config /secrets/config.json
+docker run --rm -v $(pwd)/secrets:/secrets communitytechalliance/airbyte-source-jazzhr:dev discover --config /secrets/config.json
+docker run --rm -v $(pwd)/secrets:/secrets -v $(pwd)/integration_tests:/integration_tests communitytechalliance/airbyte-source-jazzhr:dev read --config /secrets/config.json --catalog /integration_tests/configured_catalog.json
 ```
 ## Testing
 Make sure to familiarize yourself with [pytest test discovery](https://docs.pytest.org/en/latest/goodpractices.html#test-discovery) to know how your test files and methods should be named.
