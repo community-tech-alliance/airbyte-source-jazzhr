@@ -59,6 +59,11 @@ class JazzHRStream(HttpStream, ABC):
         **kwargs,
     ) -> Iterable[Mapping]:
         response_json = response.json()
+        # The JazzHR API doesnt wrap the response in an array if there is only a single
+        # element in the page. This causes the sync to fail, so adding a check here for that.
+        if type(response_json) != list:
+            response_json = [response_json]
+
         yield from response_json
 
 
